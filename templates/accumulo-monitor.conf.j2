@@ -1,0 +1,8 @@
+description "accumulo monitor"
+
+start on stopped rc RUNLEVEL=[2345]
+respawn
+setuid accumulo
+chdir /var/lib/accumulo
+
+exec /usr/bin/accumulo monitor --address 0.0.0.0 >>/var/log/accumulo/logs/monitor.out 2>>/var/log/accumulo/logs/monitor.err

@@ -1,0 +1,6 @@
+---
+accumulo_version: "1.5.2"
+accumulo_mirror: "http://www.webhostingjams.com/mirror/apache"
+accumulo_conf_dir: "/etc/accumulo/conf"
+accumulo_log_dir: "/var/log/accumulo"
+accumulo_leader: False
