@@ -1,0 +1,4 @@
+.vagrant
+
+examples/roles/azavea.java
+examples/roles/azavea.build-essential
