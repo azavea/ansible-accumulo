@@ -1,0 +1,33 @@
+---
+- name: Download Accumulo packages
+  get_url: url="{{ accumulo_mirror }}/accumulo/{{ accumulo_version }}/accumulo-{{ accumulo_version }}-{{ item }}.deb"
+           dest="/usr/local/src/accumulo-{{ accumulo_version }}-{{ item }}.deb"
+  with_items:
+    - bin
+    - native
+
+- name: Install Accumulo dependencies
+  apt: pkg=g++-multilib state=present
+
+- name: Install Accumulo
+  command: "dpkg --ignore-depends=hadoop,zookeeper -i /usr/local/src/accumulo-{{ accumulo_version }}-bin.deb"
+  args:
+    creates: "{{ accumulo_conf_dir }}"
+
+- name: Install Accumulo native libraries
+  command: "dpkg --ignore-depends=hadoop,zookeeper -i /usr/local/src/accumulo-{{ accumulo_version }}-native.deb"
+  args:
+    creates: "/usr/lib/accumulo/server/src/main/c++"
+
+- name: Fix Accumulo native library post-install script
+  lineinfile: dest="/var/lib/dpkg/info/accumulo-native.postinst"
+              regexp="^cd /usr/lib/accumulo"
+              line="cd /usr/lib/accumulo/server/src/main/c++"
+              state=present
+  register: fix_accumulo_post_install
+
+- name: Build Accumulo native libraries
+  command: dpkg-reconfigure accumulo-native
+  args:
+    creates: /usr/lib/accumulo/lib/native/map/libNativeMap-Linux-amd64-64.so
+  when: fix_accumulo_post_install | changed
